@@ -40,14 +40,19 @@ public class EasyVantSim implements java.io.Serializable {
   public int numRules;
   public char[] rules;
   public int a; 
- 
+
+  // colors
+  int colorMode = 0;
+
 
   // Default constructor 
-  public EasyVantSim(PApplet pa, int a) {
+  public EasyVantSim(PApplet pa, int maxRuleChars) {
     this.pa = pa;
-    this.a = a;
+
     conColor = pa.color(127);
-    ruleDecValueMax = (int)pa.pow(2, maxRuleChars)-1;
+    // int range -2,147,483,648 - 2,147,483,647 
+    // long range -9,223,372,036,854,775,808  - -9,223,372,036,854,775,807
+    ruleDecValueMax = (int)pa.pow(2, this.maxRuleChars)-1;
 
 
     //cp5 = new ControlP5(this.pa);
@@ -76,7 +81,8 @@ public class EasyVantSim implements java.io.Serializable {
 
     mirror = false;
     ruleDecValue = 0;
-    maxRuleChars = 16;
+    //maxRuleChars = 16;
+    this.maxRuleChars = maxRuleChars;
     ruleDecValueMax = 6;
 
     // rule definition
@@ -92,31 +98,33 @@ public class EasyVantSim implements java.io.Serializable {
   void linkPApplet(PApplet pa) {
     this.pa = pa;
   }
-  
-  void injectUIData(int ss, int sm, int re, int rea, int nr) {
+
+  void injectUIData(int ss, int sm, int re, int rea, int nr, int cm) {
     SuperSpeed = ss;
     SpeedMultiplier = sm;
     RuleEnumuration = re;
     RuleEnumurationAdjust = rea;
     NumRules = nr;
+    colorMode = cm;
     //if(rb==true)
-      //ResetButton(0);
+    //ResetButton(0);
   }
 
 
 
   char[] intToRuleChars(int num) {
     //pa.println("num = " + num + ", maxRuleChars = " + maxRuleChars
-     //  + ", numMax = " + (int)pa.pow(2, maxRuleChars-1));
+    //  + ", numMax = " + (int)pa.pow(2, maxRuleChars-1));
 
     for (int i = maxRuleChars-1; i >=0; i --) {
       int numMax = (int)pa.pow(2, i);
-      //println(maxRuleChars-1);
+      //pa.println(maxRuleChars-1);
       if (num >= numMax) {
         rules[i] = 'R';
         num -= numMax;
         //println("num: "+num+"numMax: "+numMax);
       } else {
+        //pa.println(rules.length);
         rules[i] = 'L';
       }
     }
@@ -152,45 +160,108 @@ public class EasyVantSim implements java.io.Serializable {
     y = rows/2;
     this.generations = 0;
   }
+  int getColorFromRules(int cell) {
+    int color = 0;
+    if (colorMode == 0) {
+      color =(int)pa.color(cell);
+    } else if (colorMode == 1) {
+      color = getRetroColors1(cell);
+    } else if (colorMode == 2) {
+      color = getRetroColors2(cell);
+    }
+    return color;
+  }
+  int getRetroColors1(int cell) {
+    int color = -1; 
+    cell = cell % 16;
+    if ( cell == 0 ) {
+      color = pa.color(0);
+    } else if ( cell == 1 ) {
+      color = pa.color(0, 127, 255);
+    } else if (cell == 2 ) {
+      //print("hello");
+      color = pa.color(255, 0, 127);
+    } else if (cell == 3 ) {
+      color = pa.color(127, 255, 0);
+    } else if ( cell == 4 ) {
+      color = pa.color(0, 127, 0);
+    } else if (cell == 5 ) {
+      //print("hello");
+      color = pa.color(64, 0, 0);
+    } else if (cell == 6 ) {
+      color = pa.color(0, 64, 64);
+    } else if (cell == 7 ) {
+      color = pa.color(64, 64, 64);
+    } else if (cell == 8 ) {
+      color = pa.color(12, 0, 64);
+    } else if (cell == 9 ) {
+      color = pa.color(0, 32, 64);
+    } else if (cell == 10 ) {
+      color = pa.color(0, 128, 64);
+    } else if (cell == 11 ) {
+      color = pa.color(128, 0, 64);
+    } else if (cell == 12 ) {
+      color = pa.color(0, 32, 128);
+    } else if (cell == 13 ) {
+      color = pa.color(32, 0, 128);
+    } else if (cell == 14 ) {
+      color = pa.color(128, 0, 128);
+    } else if (cell == 15 ) {
+      color = pa.color(0, 128, 128);
+    }
+    return color;
+  }
+  int getRetroColors2(int cell) {
+    //cell = cell % 16;
+    int color = -1;
+    if ( cell == 0 ) {
+      color = pa.color(0);
+    } else if ( cell == 1 ) {
+      color = pa.color(0, 127, 255);
+    } else if (cell == 2 ) {
+      //print("hello");
+      color = pa.color(255, 0, 127);
+    } else if (cell == 3 ) {
+      color = pa.color(127, 255, 0);
+    } else if ( cell == 4 ) {
+      color = pa.color(0, 127, 0);
+    } else if (cell == 5 ) {
+      //print("hello");
+      color = pa.color(64, 0, 0);
+    } else if (cell == 6 ) {
+      color = pa.color(0, 64, 64);
+    } else if (cell == 7 ) {
+      color = pa.color(64, 64, 64);
+    } else if (cell == 8 ) {
+      color = pa.color(12, 0, 64);
+    } else if (cell == 9 ) {
+      color = pa.color(0, 32, 64);
+    } else if (cell == 10 ) {
+      color = pa.color(0, 128, 64);
+    } else if (cell == 11 ) {
+      color = pa.color(128, 0, 64);
+    } else if (cell == 12 ) {
+      color = pa.color(0, 32, 128);
+    } else if (cell == 13 ) {
+      color = pa.color(32, 0, 128);
+    } else if (cell == 14 ) {
+      color = pa.color(128, 0, 128);
+    } else if (cell == 15 ) {
+      color = pa.color(0, 128, 128);
+    }
+    return color;
+  }
   void drawBoard() {
     for (int i = 0; i < cols; i ++ ) {
       for (int j = 0; j < rows; j++) {
         int cell = grid[i][j];
-        if ( cell == 0 ) {
-          pa.fill(0);
-        } else if ( cell == 1 ) {
-          pa.fill(0, 127, 255);
-        } else if (cell == 2 ) {
-          //print("hello");
-          pa.fill(255, 0, 127);
-        } else if (cell == 3 ) {
-          pa.fill(127, 255, 0);
-        } else if ( cell == 4 ) {
-          pa.fill(0, 127, 0);
-        } else if (cell == 5 ) {
-          //print("hello");
-          pa.fill(64, 0, 0);
-        } else if (cell == 6 ) {
-          pa.fill(0, 64, 64);
-        } else if (cell == 7 ) {
-          pa.fill(64, 64, 64);
-        } else if (cell == 8 ) {
-          pa.fill(12, 0, 64);
-        } else if (cell == 9 ) {
-          pa.fill(0, 32, 64);
-        } else if (cell == 10 ) {
-          pa.fill(0, 128, 64);
-        } else if (cell == 11 ) {
-          pa.fill(128, 0, 64);
-        } else if (cell == 12 ) {
-          pa.fill(0, 32, 128);
-        } else if (cell == 13 ) {
-          pa.fill(32, 0, 128);
-        } else if (cell == 14 ) {
-          pa.fill(128, 0, 128);
-        } else if (cell == 15 ) {
-          pa.fill(0, 128, 128);
+        int color = getColorFromRules(cell);
+        if(color != -1) {
+          pa.fill(color);
         }
+        /*
+       
+         */
         //hi 
 
 
@@ -279,12 +350,12 @@ public class EasyVantSim implements java.io.Serializable {
     }
   }
   public void draw() {
-    
+
     for (int i = 0; i < rules.length; i ++) {
       //pa.print(rules[i]);
     }
     //pa.println("");
-    pa.background(0);
+
     // draw ant on the board
     //numRules = RuleEnumuration;
     numRules = NumRules;
@@ -293,8 +364,14 @@ public class EasyVantSim implements java.io.Serializable {
     for (int i = 0; i < numRules; i++) {
       ruleStr += rules[i];
     }
+    String ruleStrB = ""; // generate a rule string up to the Boundry
+    for (int i = 0; i < cell; i++) {
+      ruleStrB += rules[i];
+    }
+    pa.fill(127);
+    pa.text(ruleStr, 900, 100, 800, 800);
     pa.fill(255);
-    pa.text(ruleStr, 100, 100);
+    pa.text(ruleStrB, 900, 100, 800, 800);
     //pa.println(SuperSpeed);
     for (int i = 0; i < SuperSpeed * SpeedMultiplier; i ++ ) {
       this.update();
@@ -306,18 +383,19 @@ public class EasyVantSim implements java.io.Serializable {
     // update board
     drawBoard();
     // draw board
-    pa.fill(0);
-    pa.textSize(24);
-    pa.text("Generations: "+ generations, 25, 25);
-    pa.fill(0);
-    pa.textSize(24);
-    pa.text("Generations: "+ generations, 27, 27);
-    pa.fill(0);
-    pa.textSize(24);
-    pa.text("Generations: "+ generations, 27, 25);
-    pa.fill(0);
-    pa.textSize(24);
-    pa.text("Generations: "+ generations, 25, 27);
+    /*pa.fill(0);
+     pa.textSize(24);
+     pa.text("Generations: "+ generations, 25, 25);
+     pa.fill(0);
+     pa.textSize(24);
+     pa.text("Generations: "+ generations, 27, 27);
+     pa.fill(0);
+     pa.textSize(24);
+     pa.text("Generations: "+ generations, 27, 25);
+     pa.fill(0);
+     pa.textSize(24);
+     pa.text("Generations: "+ generations, 25, 27);
+     */
     pa.fill(255);
     pa.textSize(24);
     pa.text("Generations: "+ generations, 26, 26);

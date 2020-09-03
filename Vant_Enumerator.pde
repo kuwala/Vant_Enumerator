@@ -24,12 +24,26 @@ int RuleEnumurationAdjust = 4;
 int NumRules = 4;
 boolean ResetButton = false;
 int ruleDecValue = 0;
-int maxRuleChars = 16;
+int maxRuleChars = 1024;
 int ruleDecValueMax = 18;
 
+int colorModeMax = 2;
+int ColorMode = 0; 
+// 0 - grayscale cells
+// 1 - original hand picked retro colors w/ modulo on value over flow
+// 2 - original hand picked retro colors w/ ignore new color on value over flow (bug/ still cool)
+
+boolean showUI = true;
+
+int numSaveSlots = 16;
+int SaveSlot = 0;
+String saveNameUI = "ui_save" +str(SaveSlot) + ".ser";
+String saveNameSim = "sim_save" +str(SaveSlot) + ".ser";
+
+Slider slide;
 //String filename = sketchPath() + "vant_data.ser";
-File sim_save_file = dataFile("sim_save.ser");
-File ui_save_file = dataFile("ui_save.ser");
+File sim_save_file;
+File ui_save_file;
 
 public void ResetButton(int theValue) {
   simObject.ResetButton(0);
@@ -41,6 +55,11 @@ public void LoadButton() {
   // so there is a first time load and first time save skip flag
   // that gets set instead of executing the desired functions
   println("load button hit");
+  // deriver file name from SaveSlot int value + string
+  saveNameUI = "ui_save" +str(SaveSlot) + ".ser";
+  saveNameSim = "sim_save" +str(SaveSlot) + ".ser";
+  File sim_save_file = dataFile(saveNameSim);
+  File ui_save_file = dataFile(saveNameUI);
 
   String filename = sim_save_file.getPath();
   String filename2 = ui_save_file.getPath();
@@ -164,7 +183,7 @@ public void saveUIObject(String filename) {
 
     ObjectOutputStream out = new ObjectOutputStream(file); 
     // Method for serialization of object
-    uiObject.injectUIData(SuperSpeed, SpeedMultiplier, RuleEnumuration, RuleEnumurationAdjust, NumRules);
+    uiObject.injectUIData(SuperSpeed, SpeedMultiplier, RuleEnumuration, RuleEnumurationAdjust, NumRules, ColorMode);
     println("heellooo from save ui");
 
     out.writeObject(uiObject); 
@@ -188,6 +207,10 @@ public void saveUIObject(String filename) {
 public void SaveButton() {
   println("save button hit");
   //loadUIDataIntoObject();
+  saveNameUI = "ui_save" +str(SaveSlot) + ".ser";
+  saveNameSim = "sim_save" +str(SaveSlot) + ".ser";
+  File sim_save_file = dataFile(saveNameSim);
+  File ui_save_file = dataFile(saveNameUI);
   if(firstTimeSaveSkipped == false){
     firstTimeSaveSkipped = true;
   } else {
@@ -204,14 +227,14 @@ void setup() {
   println(sim_save_file.getPath());
   //testSer();
   noStroke();
-  frameRate(30);
+  frameRate(120);
 
   fullScreen();
   //size(900, 900);
 
 
   ruleDecValueMax = (int)pow(2, maxRuleChars)-1;
-  simObject = new EasyVantSim(this, 3);
+  simObject = new EasyVantSim(this, maxRuleChars);
   uiObject = new UIData();
   simObject.setup();
 
@@ -227,7 +250,7 @@ void setupUI() {
   //    .setPosition(400,100)
   //    .setSize(200,19)
   //    .setState(true);
-  cp5.addSlider("SuperSpeed")
+  slide =  cp5.addSlider("SuperSpeed")
     .setPosition(100, 30)
     .setWidth(600)
     .setRange(1, 500)
@@ -235,28 +258,42 @@ void setupUI() {
 
   cp5.addSlider("SpeedMultiplier")
     .setPosition(100, 50)
-    .setWidth(600)
-    .setRange(1, 500)
+    .setWidth(1200)
+    .setRange(1, 2000)
     ;
 
   cp5.addSlider("RuleEnumuration")
     .setPosition(100, 120)
     .setWidth(800)
     .setRange(0, ruleDecValueMax)
-    .setNumberOfTickMarks(ruleDecValueMax)
     ;
   cp5.addSlider("RuleEnumurationAdjust")
     .setPosition(100, 160)
     .setWidth(800)
     .setRange(0, 800)
-    .setNumberOfTickMarks(800)
     ;
+    
+
   cp5.addSlider("NumRules")
     .setPosition(100, 220)
     .setWidth(200)
     .setRange(1, maxRuleChars-1)
     .setNumberOfTickMarks(maxRuleChars-1)
     ;
+    
+  cp5.addSlider("SaveSlot")
+    .setPosition(100, 70)
+    .setWidth(200)
+    .setRange(1, numSaveSlots)
+    .setNumberOfTickMarks(numSaveSlots)
+    ;
+    cp5.addSlider("ColorMode")
+    .setPosition(100, 85)
+    .setWidth(200)
+    .setRange(0, colorModeMax)
+    .setNumberOfTickMarks(colorModeMax+1)
+    ;
+   
   //cp5.addSlider("CellSize")
   //   .setPosition(100,140)
   //   .setWidth(200)
@@ -281,17 +318,32 @@ void setupUI() {
     ;
 }
 
-void mousePressed() {
+void mouseReleased() {
  if(mouseButton == RIGHT) {
-   //reset();
+   simObject.ResetButton(1333333337);
  }
 }
 
+void keyPressed() {
+  if(key == 'q') {
+    if(showUI == true) {
+      cp5.hide();
+      showUI = false;
+    } else {
+      cp5.show();
+      showUI = true;
+    }
+  }
+  if(key == 'r') {
+  simObject.ResetButton(69); // 69 black magic 
+  }
+}
 
 void draw() {
   //object.update();
-  SuperSpeed = 100;
-  simObject.injectUIData(SuperSpeed, SpeedMultiplier, RuleEnumuration, RuleEnumurationAdjust, NumRules);
+  background(32);
+  //----->//slide.setValue(40);
+  simObject.injectUIData(SuperSpeed, SpeedMultiplier, RuleEnumuration, RuleEnumurationAdjust, NumRules, ColorMode);
   //object.SuperSpeed = SuperSpeed;
   //object.SpeedMultiplier = SpeedMultiplier;
   simObject.draw();

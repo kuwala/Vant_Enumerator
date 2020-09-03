@@ -12,6 +12,7 @@ class UIData implements java.io.Serializable  {
   public int RuleEnumurationAdjust;
   
   public int NumRules;
+  public int colorMode;
   //int ruleDecValue;
   //int maxRuleChars;
   //int ruleDecValueMax;
@@ -32,12 +33,13 @@ class UIData implements java.io.Serializable  {
   // rule definition
   //numRules = 4;
   }
-  public void injectUIData(int ss, int sm, int re, int rea, int nr) {
+  public void injectUIData(int ss, int sm, int re, int rea, int nr, int cm) {
     SuperSpeed = ss;
     SpeedMultiplier = sm;
     RuleEnumuration = re;
     RuleEnumurationAdjust = rea;
     NumRules = nr;
+    colorMode = cm;
     //if(rb==true)
       //ResetButton(0);
   }
